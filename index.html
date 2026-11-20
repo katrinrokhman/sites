@@ -1,7 +1,478 @@
 <!doctype html>
 <html lang="ru">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Привет, мир!</title></head>
-<body style="font-family: system-ui, sans-serif; display:grid; place-items:center; min-height:100vh; margin:0;">
-<h1>Привет, мир!</h1>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>КАРКАС — система обеспечения персоналом для генподрядчика</title>
+<meta name="description" content="КАРКАС связывает график объектов, найм и деньги на персонал в одну систему. Люди на объекте — в срок и по понятной цене.">
+<meta property="og:title" content="КАРКАС — люди на объекте в срок и по понятной цене">
+<meta property="og:description" content="Система обеспечения персоналом для генерального подрядчика: план людей под график работ, найм по единым правилам, деньги на персонал в рублях.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F2F4F3'/%3E%3Cpath d='M7 5v22M25 5v22M7 11h18M7 19h18' stroke='%2324292E' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed:ital,wght@0,500;0,600;0,700;1,500&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #F2F4F3;   /* калька */
+  --ink: #24292E;     /* графит */
+  --pencil: #5B636B;  /* карандаш */
+  --grid: #D3D9D8;    /* сетка */
+  --remark: #B7372A;  /* красный карандаш: только потери */
+  --done: #2E6A50;    /* обеспечено */
+  --display: "Fira Sans Extra Condensed", "Arial Narrow", sans-serif;
+  --text: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --measure: 66ch;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  padding: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 1.0625rem/1.55 var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+@media (min-width: 900px) {
+  /* Поле для подшивки слева шире, как у листа чертежа */
+  body { padding: 18px 18px 18px 52px; font-size: 1.125rem; }
+}
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--remark); outline-offset: 3px; }
+
+/* ---------- Лист ---------- */
+.sheet {
+  border: 2px solid var(--ink);
+  min-height: calc(100vh - 20px);
+}
+.wrap { padding: 0 20px; max-width: 1180px; margin: 0 auto; }
+@media (min-width: 900px) { .wrap { padding: 0 48px; } }
+
+/* ---------- Шапка ---------- */
+.top {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding-top: 18px; padding-bottom: 18px;
+  border-bottom: 1px solid var(--grid);
+}
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  font: 700 1.6rem/1 var(--display); letter-spacing: .06em; text-decoration: none;
+}
+.logo svg { width: 26px; height: 26px; flex: none; }
+.nav { display: flex; gap: 22px; font: 500 1.05rem/1 var(--display); }
+.nav a { text-decoration: none; padding: 6px 0; border-bottom: 1px solid transparent; }
+.nav a:hover { border-bottom-color: var(--ink); }
+@media (max-width: 640px) { .nav a:not(.nav-contact) { display: none; } }
+
+/* ---------- Первый экран ---------- */
+.hero {
+  display: grid; gap: 40px;
+  padding-top: 48px; padding-bottom: 56px;
+}
+@media (min-width: 1000px) {
+  .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 56px; padding-top: 72px; padding-bottom: 80px; }
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 600; margin: 0; }
+h1 {
+  font-size: clamp(2.9rem, 3.4vw + 1.1rem, 4.6rem);
+  line-height: .98; letter-spacing: -.005em;
+  max-width: 16ch; text-wrap: balance;
+}
+.lead { margin: 24px 0 0; max-width: 40ch; font-size: 1.2rem; color: var(--ink); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; margin-top: 32px; }
+.btn {
+  display: inline-block; padding: 15px 26px;
+  background: var(--ink); color: var(--paper);
+  font: 600 1.2rem/1 var(--display); letter-spacing: .02em; text-decoration: none;
+  border: 2px solid var(--ink);
+}
+.btn:hover { background: var(--paper); color: var(--ink); }
+.link { font-weight: 500; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+
+/* ---------- График движения рабочих кадров ---------- */
+.chart { margin: 0; border: 1px solid var(--ink); background: #fff; }
+.chart-head {
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 12px 16px; border-bottom: 1px solid var(--ink);
+  font: 500 1.05rem/1.25 var(--display);
+}
+.chart-head span:last-child { color: var(--pencil); font-style: italic; }
+.chart-body { padding: 14px 16px 10px; overflow-x: auto; }
+.g {
+  --label: 118px;
+  display: grid; grid-template-columns: var(--label) repeat(6, minmax(34px, 1fr));
+  min-width: 330px;
+}
+.hero > * { min-width: 0; }
+@media (max-width: 440px) {
+  .g { --label: 84px; min-width: 264px; grid-template-columns: var(--label) repeat(6, minmax(28px, 1fr)); }
+  .g-name, .g-axis-name { font-size: .88rem; }
+  .chart-head { padding: 10px 12px; }
+  .chart-body { padding: 12px 10px 8px; }
+  .legend { padding: 0 12px 12px; }
+  .chart-note { padding: 10px 12px 12px; }
+}
+.g-row { display: contents; }
+.g-name { font: 500 .95rem/1.2 var(--display); padding: 5px 8px 5px 0; color: var(--ink); align-self: center; }
+.g-track { grid-column: 2 / -1; position: relative; height: 26px; border-left: 1px solid var(--grid); }
+.g-track::before {
+  content: ""; position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(100% / 6 - 1px), var(--grid) calc(100% / 6 - 1px) calc(100% / 6));
+}
+.g-work { position: absolute; top: 9px; height: 9px; background: var(--ink); }
+.g-sep { grid-column: 1 / -1; height: 1px; background: var(--ink); margin: 10px 0 8px; }
+.g-axis-name { font: 500 .95rem/1.2 var(--display); align-self: end; padding: 0 8px 6px 0; }
+.g-axis-name small { display: block; font: italic 500 .85rem/1.2 var(--display); color: var(--pencil); }
+.g-col {
+  position: relative; height: 170px;
+  border-left: 1px solid var(--grid);
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.g-need {
+  position: relative; width: 62%;
+  height: calc(var(--need) / 50 * 100%);
+  border: 1.5px solid var(--ink); border-bottom: 0;
+  background: repeating-linear-gradient(-45deg, var(--remark) 0 1.5px, transparent 1.5px 6px);
+}
+.g-have {
+  position: absolute; left: -1.5px; right: -1.5px; bottom: 0;
+  height: calc(var(--have) / var(--need) * 100%);
+  background: var(--ink);
+  transform-origin: bottom;
+}
+.g-gap {
+  position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%);
+  font: 700 1rem/1 var(--display); color: var(--remark); white-space: nowrap;
+}
+.g-month { grid-row: auto; text-align: center; font: 500 .95rem/1 var(--display); color: var(--pencil); padding-top: 8px; }
+.g-month:first-of-type { grid-column: 2; }
+.chart-note {
+  margin: 0; padding: 12px 16px 14px; border-top: 1px solid var(--grid);
+  font: italic 500 1.05rem/1.35 var(--display); color: var(--remark);
+}
+.legend { display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 0 16px 14px; font: 500 .95rem/1.2 var(--display); color: var(--pencil); }
+.legend i { display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: -2px; border: 1.5px solid var(--ink); }
+.legend .l-have { background: var(--ink); }
+.legend .l-gap { background: repeating-linear-gradient(-45deg, var(--remark) 0 1.5px, transparent 1.5px 5px); }
+
+/* Единственный «живой» момент страницы: при загрузке растут столбцы, затем проступает нехватка */
+@media (prefers-reduced-motion: no-preference) {
+  .g-have { animation: grow .9s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i) * 110ms + 200ms); }
+  .g-need { animation: hatch .6s ease-out both; animation-delay: 1.15s; }
+  .g-gap, .chart-note { animation: appear .5s ease-out both; animation-delay: 1.5s; }
+}
+@keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes hatch { from { background-size: 0 0; } to { background-size: auto; } }
+@keyframes appear { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- Разделы ---------- */
+.section { padding-top: 64px; padding-bottom: 64px; border-top: 1px solid var(--grid); }
+@media (min-width: 900px) { .section { padding-top: 88px; padding-bottom: 88px; } }
+h2 { font-size: clamp(2.1rem, 2.6vw + 1.2rem, 3.4rem); line-height: 1.02; max-width: 22ch; }
+.intro { margin: 18px 0 0; max-width: var(--measure); color: var(--pencil); font-size: 1.15rem; }
+
+/* Замечания: где теряются деньги */
+.remarks { list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 0 56px; }
+@media (min-width: 900px) { .remarks { grid-template-columns: 1fr 1fr; } }
+.remarks li {
+  position: relative; padding: 18px 0 18px 34px;
+  border-bottom: 1px solid var(--grid); max-width: 56ch;
+}
+.remarks li::before {
+  /* отметка красным карандашом на полях — как пометка правки на чертеже */
+  content: ""; position: absolute; left: 6px; top: 20px; bottom: 20px;
+  width: 3px; background: var(--remark);
+}
+.remarks b { display: block; font: 600 1.35rem/1.15 var(--display); margin-bottom: 4px; }
+.remarks span { color: var(--pencil); }
+
+/* Три связанные части системы */
+.chain { margin-top: 44px; display: grid; gap: 28px; }
+@media (min-width: 900px) { .chain { grid-template-columns: repeat(3, 1fr); gap: 0; } }
+.chain-part { padding: 0; }
+@media (min-width: 900px) {
+  .chain-part { padding: 0 32px; border-left: 1px solid var(--ink); }
+  .chain-part:first-child { padding-left: 0; border-left: 0; }
+}
+.chain-part h3 { font-size: 1.75rem; line-height: 1.1; }
+.chain-part p { margin: 10px 0 0; color: var(--pencil); }
+.chain-arrow { display: none; }
+.also { margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--grid); display: grid; gap: 14px; max-width: 980px; }
+@media (min-width: 900px) { .also { grid-template-columns: 1fr 1fr; gap: 14px 56px; } }
+.also p { margin: 0; }
+.also b { font-weight: 600; }
+
+/* Путь человека на объект — настоящая последовательность, поэтому с номерами */
+.route { list-style: none; margin: 40px 0 0; padding: 0; counter-reset: step; display: grid; }
+@media (min-width: 1000px) { .route { grid-template-columns: repeat(8, 1fr); } }
+.route li {
+  counter-increment: step; position: relative;
+  padding: 14px 0 14px 46px; border-bottom: 1px solid var(--grid);
+  font: 500 1.2rem/1.2 var(--display);
+}
+.route li::before {
+  content: counter(step); position: absolute; left: 0; top: 11px;
+  width: 30px; height: 30px; border: 1.5px solid var(--ink); border-radius: 50%;
+  display: grid; place-items: center; font: 600 1.05rem/1 var(--display);
+}
+@media (min-width: 1000px) {
+  .route li { padding: 48px 12px 0 0; border-bottom: 0; border-top: 1.5px solid var(--ink); }
+  .route li::before { top: -16px; left: 0; background: var(--paper); }
+}
+.route-note { margin: 28px 0 0; max-width: var(--measure); color: var(--pencil); }
+
+/* Сравнение */
+.compare-wrap { margin-top: 40px; overflow-x: auto; border: 1px solid var(--ink); background: #fff; }
+table { border-collapse: collapse; width: 100%; min-width: 720px; }
+th, td { text-align: left; vertical-align: top; padding: 14px 16px; border-bottom: 1px solid var(--grid); }
+thead th { font: 600 1.15rem/1.15 var(--display); border-bottom: 1px solid var(--ink); }
+tbody th { font: 500 1.05rem/1.2 var(--display); color: var(--pencil); width: 19%; }
+td { color: var(--pencil); }
+.us { background: var(--paper); color: var(--ink); font-weight: 500; }
+thead .us { border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+tbody .us { border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+
+/* Запуск */
+.stages { list-style: none; margin: 40px 0 0; padding: 0; counter-reset: st; }
+.stages li {
+  counter-increment: st;
+  display: grid; gap: 6px 32px; padding: 22px 0; border-bottom: 1px solid var(--grid);
+}
+@media (min-width: 900px) { .stages li { grid-template-columns: 70px 1.2fr 150px 2.2fr; align-items: baseline; } }
+.stages li::before { content: counter(st); font: 600 2.6rem/1 var(--display); }
+.stages h3 { font-size: 1.6rem; }
+.stages .term { font: italic 500 1.15rem/1.2 var(--display); color: var(--ink); }
+.stages p { margin: 0; color: var(--pencil); max-width: 52ch; }
+.honest { margin: 28px 0 0; max-width: var(--measure); padding-left: 18px; border-left: 3px solid var(--ink); }
+
+/* ИИ */
+.ai { margin-top: 40px; display: grid; gap: 40px; }
+@media (min-width: 1000px) { .ai { grid-template-columns: 3fr 2fr; gap: 64px; } }
+.ai ul { list-style: none; margin: 0; padding: 0; }
+.ai li { padding: 14px 0; border-bottom: 1px solid var(--grid); }
+.ai li b { display: block; font: 600 1.3rem/1.2 var(--display); }
+.ai li span { color: var(--pencil); }
+.rules p { margin: 0 0 16px; max-width: 46ch; }
+.rules p:first-child { font: 600 1.6rem/1.15 var(--display); }
+
+/* Что остаётся */
+.keep { margin: 36px 0 0; padding: 0; list-style: none; display: grid; gap: 0 56px; }
+@media (min-width: 900px) { .keep { grid-template-columns: repeat(4, 1fr); } }
+.keep li { padding: 16px 0; border-top: 1.5px solid var(--ink); font: 600 1.35rem/1.2 var(--display); }
+.keep li span { display: block; margin-top: 6px; font: 400 1rem/1.5 var(--text); color: var(--pencil); }
+
+/* ---------- Связаться и штамп ---------- */
+.contact { display: grid; gap: 40px; align-items: end; }
+@media (min-width: 1000px) { .contact { grid-template-columns: 1fr minmax(0, 560px); } }
+.contact p { max-width: 48ch; }
+.stamp {
+  border: 2px solid var(--ink); background: #fff;
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  font: 500 1rem/1.2 var(--display);
+}
+.stamp div { padding: 8px 12px; border-right: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+.stamp div:nth-child(3n) { border-right: 0; }
+.stamp small { display: block; font: italic 500 .82rem/1.2 var(--display); color: var(--pencil); margin-bottom: 3px; }
+.stamp .wide { grid-column: span 2; }
+.stamp .full { grid-column: 1 / -1; border-right: 0; }
+.stamp .big { font: 700 2rem/1 var(--display); letter-spacing: .06em; }
+.stamp .last { border-bottom: 0; }
+.contact-line { font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="wrap top">
+    <a class="logo" href="#top" aria-label="КАРКАС — в начало">
+      <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M4 2v22M22 2v22M4 9h18M4 17h18" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>
+      КАРКАС
+    </a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="#system">Как устроено</a>
+      <a href="#launch">Запуск</a>
+      <a class="nav-contact" href="#contact">Связаться</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="wrap hero" aria-labelledby="h1">
+      <div>
+        <h1 id="h1">Люди на&nbsp;объекте&nbsp;— в&nbsp;срок и&nbsp;по&nbsp;понятной цене</h1>
+        <p class="lead">КАРКАС связывает график объектов, найм и&nbsp;деньги на&nbsp;персонал в&nbsp;одну систему. Объект получает людей к&nbsp;дате мобилизации, а&nbsp;собственник видит, сколько стоит каждая незакрытая позиция.</p>
+        <div class="actions">
+          <a class="btn" href="#contact">Обсудить ваш объект</a>
+          <a class="link" href="#system">Как устроена система</a>
+        </div>
+      </div>
+
+      <figure class="chart" aria-labelledby="chart-cap">
+        <div class="chart-head" id="chart-cap">
+          <span>График движения рабочих кадров</span>
+          <span>Жилой дом, 17 этажей — пример</span>
+        </div>
+        <div class="chart-body">
+          <div class="g" role="img" aria-label="Пример: по графику работ объекту нужно от 14 до 48 человек в месяц. В феврале не хватает 7 человек, в марте 8, в мае 8.">
+            <div class="g-row"><div class="g-name">Земляные работы</div><div class="g-track"><span class="g-work" style="left:0;width:30%"></span></div></div>
+            <div class="g-row"><div class="g-name">Монолит</div><div class="g-track"><span class="g-work" style="left:20%;width:50%"></span></div></div>
+            <div class="g-row"><div class="g-name">Кладка и&nbsp;фасад</div><div class="g-track"><span class="g-work" style="left:50%;width:50%"></span></div></div>
+            <div class="g-row"><div class="g-name">Инженерные системы</div><div class="g-track"><span class="g-work" style="left:55%;width:45%"></span></div></div>
+            <div class="g-sep" aria-hidden="true"></div>
+            <div class="g-axis-name">Людей на&nbsp;объекте<small>нужно / вышло</small></div>
+            <div class="g-col" style="--need:14;--have:14;--i:0"><div class="g-need"><div class="g-have"></div></div></div>
+            <div class="g-col" style="--need:26;--have:19;--i:1"><div class="g-need"><div class="g-have"></div><span class="g-gap">−7</span></div></div>
+            <div class="g-col" style="--need:41;--have:33;--i:2"><div class="g-need"><div class="g-have"></div><span class="g-gap">−8</span></div></div>
+            <div class="g-col" style="--need:48;--have:48;--i:3"><div class="g-need"><div class="g-have"></div></div></div>
+            <div class="g-col" style="--need:39;--have:31;--i:4"><div class="g-need"><div class="g-have"></div><span class="g-gap">−8</span></div></div>
+            <div class="g-col" style="--need:22;--have:22;--i:5"><div class="g-need"><div class="g-have"></div></div></div>
+            <div aria-hidden="true"></div>
+            <div class="g-month">янв</div><div class="g-month">фев</div><div class="g-month">мар</div><div class="g-month">апр</div><div class="g-month">май</div><div class="g-month">июн</div>
+          </div>
+        </div>
+        <div class="legend" aria-hidden="true">
+          <span><i></i>нужно по&nbsp;графику</span>
+          <span><i class="l-have"></i>вышло на&nbsp;объект</span>
+          <span><i class="l-gap"></i>не&nbsp;хватает</span>
+        </div>
+        <p class="chart-note">Март: на&nbsp;монолите не&nbsp;хватает восьми человек. Каждый такой день — сдвиг графика, переработки и&nbsp;дорогие подрядчики на&nbsp;замену.</p>
+      </figure>
+    </section>
+
+    <section class="wrap section" aria-labelledby="loss">
+      <h2 id="loss">Где генподрядчик теряет деньги на&nbsp;людях</h2>
+      <p class="intro">Эти потери обычно не&nbsp;видны в&nbsp;отчётах. Они всплывают в&nbsp;графике работ и&nbsp;в&nbsp;ФОТ, когда исправлять уже дорого.</p>
+      <ul class="remarks">
+        <li><b>Объект стартует без&nbsp;людей</b><span>Дата мобилизации наступила, а&nbsp;ИТР и&nbsp;бригады не&nbsp;набраны.</span></li>
+        <li><b>Редких специалистов ищут месяцами</b><span>ГИП, инженеры ПТО, сметчики, специалисты по&nbsp;ОВиК, ЭОМ и&nbsp;ВК — без&nbsp;сроков и&nbsp;понимания причин.</span></li>
+        <li><b>Руководители объектов молчат</b><span>Кандидаты неделями ждут обратной связи и&nbsp;уходят к&nbsp;конкурентам.</span></li>
+        <li><b>Кандидат согласился и&nbsp;не&nbsp;вышел</b><span>Деньги на&nbsp;поиск и&nbsp;время руководителя потрачены, место на&nbsp;объекте пустое.</span></li>
+        <li><b>Новички уходят в&nbsp;первые месяцы</b><span>Не&nbsp;та зарплата, не&nbsp;те задачи, нет адаптации. Каждое раннее увольнение — повторный найм.</span></li>
+        <li><b>Подрядчики выводят людей не&nbsp;в&nbsp;срок</b><span>И&nbsp;никто не&nbsp;сравнивает стоимость человеко-смены своих и&nbsp;подрядных.</span></li>
+        <li><b>ФОТ расходится с&nbsp;бюджетом</b><span>Отклонение есть, но&nbsp;неясно, из-за численности или&nbsp;из-за ставок.</span></li>
+        <li><b>HR работает в&nbsp;режиме пожаров</b><span>Ручные отчёты, нет приоритетов и&nbsp;нормативов нагрузки. Собственник не&nbsp;видит, чем занят HR.</span></li>
+      </ul>
+    </section>
+
+    <section class="wrap section" id="system" aria-labelledby="what">
+      <h2 id="what">Не&nbsp;кадровое агентство и&nbsp;не&nbsp;внешний HR-отдел</h2>
+      <p class="intro">Мы проектируем, настраиваем и&nbsp;сопровождаем систему, в&nbsp;которой работает ваша HR-команда. Она держится на&nbsp;трёх связанных частях — как каркас здания.</p>
+      <div class="chain">
+        <div class="chain-part">
+          <h3>План людей под график работ</h3>
+          <p>У&nbsp;каждого объекта есть потребность в&nbsp;людях по&nbsp;графику производства работ, а&nbsp;не&nbsp;поток разрозненных заявок.</p>
+        </div>
+        <div class="chain-part">
+          <h3>Найм по&nbsp;единым правилам</h3>
+          <p>Заявка, подбор, оценка, выход на&nbsp;объект, адаптация и&nbsp;испытательный срок идут со&nbsp;сроками и&nbsp;ответственными.</p>
+        </div>
+        <div class="chain-part">
+          <h3>Деньги на&nbsp;персонал в&nbsp;рублях</h3>
+          <p>Сколько стоят незакрытые позиции, невыходы и&nbsp;ранние увольнения. План и&nbsp;факт ФОТ. Человеко-смена своих и&nbsp;подрядных.</p>
+        </div>
+      </div>
+      <div class="also">
+        <p><b>Пульт показателей.</b> Руководитель объекта, HR-директор и&nbsp;собственник видят одну и&nbsp;ту же картину: обеспеченность объектов, вакансии в&nbsp;срок, невыходы, текучесть новичков.</p>
+        <p><b>Ритм вместо папки с&nbsp;документами.</b> Еженедельный разбор просрочек, ежемесячный отчёт и&nbsp;сессия, ежеквартальный отчёт собственнику.</p>
+      </div>
+    </section>
+
+    <section class="wrap section" aria-labelledby="route-h">
+      <h2 id="route-h">Путь человека на&nbsp;объект</h2>
+      <p class="intro">На&nbsp;каждом шаге есть правило, ответственный, срок и&nbsp;показатель. Поэтому видно, где именно застревает позиция.</p>
+      <ol class="route">
+        <li>Потребность объекта</li>
+        <li>Заявка на&nbsp;подбор</li>
+        <li>Подбор</li>
+        <li>Оценка кандидата</li>
+        <li>Проверка документов и&nbsp;допусков</li>
+        <li>Выход на&nbsp;объект</li>
+        <li>Адаптация</li>
+        <li>Испытательный срок</li>
+      </ol>
+      <p class="route-note">Отдельно система ведёт подбор редких специалистов и&nbsp;руководителей, массовый подбор через агентства, подрядный персонал и&nbsp;экономику персонала.</p>
+    </section>
+
+    <section class="wrap section" aria-labelledby="diff">
+      <h2 id="diff">Чем КАРКАС отличается от&nbsp;агентства и&nbsp;консалтинга</h2>
+      <div class="compare-wrap">
+        <table>
+          <caption class="visually-hidden" style="position:absolute;left:-9999px">Сравнение КАРКАС с&nbsp;кадровым агентством, HR-консалтингом и&nbsp;HR-аутсорсингом</caption>
+          <thead>
+            <tr><th scope="col"></th><th scope="col">Кадровое агентство</th><th scope="col">HR-консалтинг</th><th scope="col">HR-аутсорсинг</th><th scope="col" class="us">КАРКАС</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Что продаёт</th><td>Закрытую вакансию</td><td>Отчёт, рекомендации, документы</td><td>HR-операции вместо вашей команды</td><td class="us">Работающую систему и&nbsp;её сопровождение</td></tr>
+            <tr><th scope="row">Что остаётся у&nbsp;вас</th><td>Нанятый человек</td><td>Пакет документов</td><td>Зависимость от&nbsp;подрядчика</td><td class="us">Правила, пульт, ИИ-инструменты, обученная команда</td></tr>
+            <tr><th scope="row">Связь с&nbsp;графиком объектов</th><td>Нет</td><td>Редко</td><td>Нет</td><td class="us">Основа системы</td></tr>
+            <tr><th scope="row">Экономика персонала</th><td>Нет</td><td>Иногда, разово</td><td>Нет</td><td class="us">Каждый месяц</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="wrap section" id="launch" aria-labelledby="launch-h">
+      <h2 id="launch-h">Как запускаем</h2>
+      <p class="intro">Типовой запуск занимает 3–4 месяца. Начать можно с&nbsp;диагностики и&nbsp;решить, что делать дальше, по&nbsp;её итогам.</p>
+      <ol class="stages">
+        <li><h3>Диагностика</h3><span class="term">3–6 недель</span><p>Интервью, данные, карта процесса и&nbsp;рисков, исходные показатели и&nbsp;план на&nbsp;90 дней.</p></li>
+        <li><h3>Проектирование и&nbsp;настройка</h3><span class="term">4–8 недель</span><p>Правила и&nbsp;документы, пульт показателей на&nbsp;ваших данных, ИИ-сценарии, обучение HR и&nbsp;руководителей.</p></li>
+        <li><h3>Пилот</h3><span class="term">1 месяц</span><p>Работа по&nbsp;новой системе на&nbsp;части вакансий, еженедельные разборы, отчёт «до&nbsp;и&nbsp;после» и&nbsp;решение о&nbsp;масштабировании.</p></li>
+        <li><h3>Сопровождение</h3><span class="term">ежемесячно</span><p>Разборы просрочек, отчёт собственнику, развитие системы. Мы отвечаем за&nbsp;то, чтобы она работала, а&nbsp;не&nbsp;лежала в&nbsp;папке.</p></li>
+      </ol>
+      <p class="honest">Заранее не&nbsp;обещаем, на&nbsp;сколько сократятся сроки закрытия вакансий или&nbsp;текучесть. Целевые значения фиксируем после диагностики — от&nbsp;измеренной исходной точки вашей компании.</p>
+    </section>
+
+    <section class="wrap section" aria-labelledby="ai-h">
+      <h2 id="ai-h">ИИ-помощники снимают рутину с&nbsp;HR</h2>
+      <div class="ai">
+        <ul>
+          <li><b>Текст вакансии и&nbsp;профиль должности</b><span>Из&nbsp;заявки руководителя — по&nbsp;вашему шаблону.</span></li>
+          <li><b>Сводка по&nbsp;резюме</b><span>Сопоставление с&nbsp;требованиями и&nbsp;допусками, вопросы для&nbsp;интервью.</span></li>
+          <li><b>Конспект интервью</b><span>Оценочный лист и&nbsp;резюме для&nbsp;руководителя из&nbsp;заметок интервьюера.</span></li>
+          <li><b>Сводка просрочек</b><span>Еженедельный список просроченных вакансий и&nbsp;напоминания ответственным.</span></li>
+          <li><b>Письма кандидатам</b><span>Приглашения, отказы, подтверждение выхода, памятка первого дня.</span></li>
+        </ul>
+        <div class="rules">
+          <p>Решения о&nbsp;найме и&nbsp;увольнении принимает человек.</p>
+          <p>ИИ готовит, сводит и&nbsp;напоминает. Автоматизируем только операции, у&nbsp;которых есть владелец и&nbsp;измеримое время, — сначала процесс, потом ИИ.</p>
+          <p>Персональные данные кандидатов и&nbsp;сотрудников обрабатываются по&nbsp;152-ФЗ. Во&nbsp;внешние ИИ-сервисы по&nbsp;умолчанию уходят только обезличенные данные.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap section" aria-labelledby="keep-h">
+      <h2 id="keep-h">Система остаётся у&nbsp;компании</h2>
+      <ul class="keep">
+        <li>Правила<span>Сроки обратной связи, порядок согласования оффера, ответственность за&nbsp;адаптацию.</span></li>
+        <li>Пульт показателей<span>Обеспеченность объектов, сроки, невыходы, текучесть и&nbsp;деньги.</span></li>
+        <li>ИИ-инструменты<span>Настроенные под ваши шаблоны и&nbsp;процессы.</span></li>
+        <li>Обученная команда<span>HR и&nbsp;руководители умеют работать в&nbsp;системе без&nbsp;нас.</span></li>
+      </ul>
+    </section>
+
+    <section class="wrap section" id="contact" aria-labelledby="contact-h">
+      <div class="contact">
+        <div>
+          <h2 id="contact-h">Обсудим ваш объект</h2>
+          <p class="intro">Расскажите, сколько у&nbsp;вас объектов и&nbsp;людей и&nbsp;что сейчас мешает выводить их вовремя. Предложим, с&nbsp;чего начать — обычно это диагностика на&nbsp;3–6 недель.</p>
+          <p class="contact-line" id="contact-line">Контакты для&nbsp;связи появятся здесь в&nbsp;ближайшие дни.</p>
+        </div>
+        <div class="stamp" aria-label="Карточка продукта">
+          <div class="full"><small>Продукт</small><span class="big">КАРКАС</span></div>
+          <div class="full"><small>Назначение</small>Система обеспечения персоналом для&nbsp;генерального подрядчика</div>
+          <div class="wide"><small>Для&nbsp;кого</small>Генподрядчики и&nbsp;генпроектировщики от&nbsp;20–30 человек, с&nbsp;несколькими объектами</div>
+          <div><small>Запуск</small>3–4 месяца</div>
+          <div class="last"><small>Начало</small>Диагностика</div>
+          <div class="last"><small>Версия</small>1.0</div>
+          <div class="last"><small>Дата</small>11.2026</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
 </body>
 </html>
