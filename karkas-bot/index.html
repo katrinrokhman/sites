@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КАРКАС — Люди на объекте в срок и по понятной цене</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #E4E6E3;
+            --text: #1F2A44;
+            --text-muted: #4A5568;
+            --accent: #F26B1D;
+            --accent-hover: #D95D1A;
+            --card-bg: #FFFFFF;
+            --border: #C4C8C2;
+            --focus: #F26B1D;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Manrope', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--bg);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Unbounded', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+            margin: 0 0 0.75rem;
+            color: var(--text);
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+            font-weight: 700;
+        }
+
+        h3 {
+            font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+            font-weight: 600;
+        }
+
+        p {
+            margin: 0 0 1rem;
+            color: var(--text-muted);
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--accent-hover);
+        }
+
+        a:focus-visible {
+            outline: 3px solid var(--focus);
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .section {
+            padding: 4rem 0;
+        }
+
+        .section:first-of-type {
+            padding-top: 5rem;
+        }
+
+        .section:last-of-type {
+            padding-bottom: 6rem;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: left;
+        }
+
+        .hero__subtitle {
+            font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 2.5rem;
+            max-width: 55ch;
+        }
+
+        .hero__cta {
+            display: inline-block;
+            margin-top: 1.5rem;
+        }
+
+        /* Problems list */
+        .problems {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .problems__item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .problems__item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent);
+            border-radius: 8px 0 0 8px;
+        }
+
+        .problems__item h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .problems__item p {
+            margin: 0;
+            font-size: 0.9375rem;
+        }
+
+        /* What is KARKAS */
+        .karkas__intro {
+            margin-bottom: 3rem;
+            max-width: 60ch;
+        }
+
+        .karkas__parts {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .part {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+        }
+
+        .part__number {
+            font-family: 'Unbounded', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: 0.75rem;
+            opacity: 0.3;
+        }
+
+        .part h3 {
+            margin-bottom: 0.75rem;
+        }
+
+        .part p {
+            margin: 0;
+        }
+
+        /* Timeline/How we launch */
+        .timeline {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .timeline__item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .timeline__marker {
+            font-family: 'Unbounded', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+        }
+
+        .timeline__content h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline__content p {
+            margin: 0;
+        }
+
+        /* AI assistants */
+        .ai-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .ai-list__item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ai-list__item::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .ai-list__item strong {
+            color: var(--text);
+        }
+
+        .ai-list__item span {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .ai-disclaimer {
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* Contact */
+        .contact {
+            text-align: center;
+        }
+
+        .contact__text {
+            margin-bottom: 2rem;
+            max-width: 40ch;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            font-family: 'Manrope', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.5;
+            color: #FFFFFF;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            color: #FFFFFF;
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:focus-visible {
+            outline: 3px solid var(--focus);
+            outline-offset: 3px;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .section {
+                padding: 3rem 0;
+            }
+
+            .timeline__item {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .timeline__marker {
+                display: none;
+            }
+
+            .part__number {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <!-- Hero -->
+        <section class="section hero" aria-labelledby="hero-title">
+            <h1 id="hero-title">Люди на объекте — в срок и по понятной цене</h1>
+            <p class="hero__subtitle">КАРКАС связывает график объектов, найм и деньги на персонал в одну систему.</p>
+            <a href="#contact" class="btn hero__cta">Написать на почту</a>
+        </section>
+
+        <!-- Problems -->
+        <section class="section" aria-labelledby="problems-title">
+            <h2 id="problems-title">Где генподрядчик теряет деньги на людях</h2>
+            <ul class="problems">
+                <li class="problems__item">
+                    <h3>Объект стартует без людей</h3>
+                    <p>График работ есть, а людей под ключевые роли нет — сдвигаются сроки и штрафы.</p>
+                </li>
+                <li class="problems__item">
+                    <h3>Редких специалистов ищут месяцами</h3>
+                    <p>ГИП, инженеры ПТО, сметчики, ОВиК, ЭОМ, ВК — на рынке их мало, закрываете позиции по крупицам.</p>
+                </li>
+                <li class="problems__item">
+                    <h3>Руководители объектов неделями молчат с обратной связью кандидатам</h3>
+                    <p>Кандидат ждёт, вы теряете сильных людей, конкуренты забирают их раньше.</p>
+                </li>
+                <li class="problems__item">
+                    <h3>Кандидат согласился и не вышел</h3>
+                    <p>Невыходы сжигают бюджет подбора и сдвигают старт объекта.</p>
+                </li>
+                <li class="problems__item">
+                    <h3>Новички уходят в первые месяцы</h3>
+                    <p>Ранняя текучесть начинается до выхода: с вакансии, оффера и первой недели.</p>
+                </li>
+                <li class="problems__item">
+                    <h3>Подрядчики выводят людей не в срок</h3>
+                    <p>Потеря контрольных дат ухода — простой объекта и риск качества.</p>
+                </li>
+                <li class="problems__item">
+                    <h3>ФОТ расходится с бюджетом</h3>
+                    <p>Переработки, простои, доплаты за срочность — деньги уходят в невидимые дыры.</p>
+                </li>
+                <li class="problems__item">
+                    <h3>HR работает в режиме пожаров</h3>
+                    <p>Нет системы — есть поток разрозненных заявок и ручное управление в таблицах.</p>
+                </li>
+            </ul>
+        </section>
+
+        <!-- What is KARKAS -->
+        <section class="section" aria-labelledby="karkas-title">
+            <h2 id="karkas-title">Что такое КАРКАС</h2>
+            <p class="karkas__intro">Не кадровое агентство и не внешний HR-отдел — мы проектируем, настраиваем и сопровождаем систему, в которой работает HR-команда клиента.</p>
+            <div class="karkas__parts">
+                <article class="part">
+                    <div class="part__number">1</div>
+                    <h3>План людей под график работ</h3>
+                    <p>Потребность в ИТР и рабочих считается из календарного плана: кто, когда, на какой объект и на какой срок.</p>
+                </article>
+                <article class="part">
+                    <div class="part__number">2</div>
+                    <h3>Найм по единым правилам</h3>
+                    <p>Заявка → подбор → оценка → выход на объект → адаптация → испытательный срок. Срок обратной связи — норматив, а не желание.</p>
+                </article>
+                <article class="part">
+                    <div class="part__number">3</div>
+                    <h3>Деньги на персонал в рублях</h3>
+                    <p>Стоимость незакрытых позиций, невыходов и ранних увольнений, план и факт ФОТ — всё в одном пульте.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- How we launch -->
+        <section class="section" aria-labelledby="launch-title">
+            <h2 id="launch-title">Как запускаем — 3–4 месяца</h2>
+            <div class="timeline">
+                <article class="timeline__item">
+                    <span class="timeline__marker">1</span>
+                    <div class="timeline__content">
+                        <h3>Диагностика</h3>
+                        <p>3–6 недель. Аудит текущих процессов, воронок, данных, боли руководителей и HR. База для целевых цифр.</p>
+                    </div>
+                </article>
+                <article class="timeline__item">
+                    <span class="timeline__marker">2</span>
+                    <div class="timeline__content">
+                        <h3>Проектирование и настройка</h3>
+                        <p>4–8 недель. Регламенты, шаблоны, настройка инструментов, обучение HR-команды и руководителей объектов.</p>
+                    </div>
+                </article>
+                <article class="timeline__item">
+                    <span class="timeline__marker">3</span>
+                    <div class="timeline__content">
+                        <h3>Пилот</h3>
+                        <p>1 месяц. Запуск на 1–2 объектах, сбор метрик, доработка. Целевые цифры фиксируем после диагностики.</p>
+                    </div>
+                </article>
+                <article class="timeline__item">
+                    <span class="timeline__marker">4</span>
+                    <div class="timeline__content">
+                        <h3>Сопровождение</h3>
+                        <p>Ежемесячно. Разбор метрик, дообучение, масштабирование на все объекты, ИИ-помощники в рутине.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- AI assistants -->
+        <section class="section" aria-labelledby="ai-title">
+            <h2 id="ai-title">ИИ-помощники для HR</h2>
+            <ul class="ai-list">
+                <li class="ai-list__item">
+                    <strong>Тексты вакансий</strong>
+                    <span>— под роль, объект и график работ</span>
+                </li>
+                <li class="ai-list__item">
+                    <strong>Сводки по резюме</strong>
+                    <span>— ключевые компетенции, релевантный опыт, красные флаги</span>
+                </li>
+                <li class="ai-list__item">
+                    <strong>Конспекты интервью</strong>
+                    <p>— структура, оценки, рекомендация по найму</p>
+                </li>
+                <li class="ai-list__item">
+                    <strong>Сводки просрочек</strong>
+                    <span>— по воронке, обратной связи, выводам на объект</span>
+                </li>
+                <li class="ai-list__item">
+                    <strong>Письма кандидатам</strong>
+                    <span>— приглашения, отказы, офферы, напоминания</span>
+                </li>
+            </ul>
+            <p class="ai-disclaimer">Решения о найме и увольнении принимает человек. ИИ снимает рутину, но не отвечает за людей.</p>
+        </section>
+
+        <!-- Contact -->
+        <section class="section contact" id="contact" aria-labelledby="contact-title">
+            <h2 id="contact-title">Готовы обсудить объект?</h2>
+            <p class="contact__text">Напишите, какой объект запускаете и где бьются сроки — предложу первый шаг диагностики.</p>
+            <a href="mailto:katrinrokhman@gmail.com?subject=КАРКАС:%20обсудить%20объект" class="btn">Написать на почту</a>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            КАРКАС — система обеспечения персоналом для генподрядчика. 2026
+        </div>
+    </footer>
+</body>
+</html>
